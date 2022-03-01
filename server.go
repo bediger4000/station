@@ -6,14 +6,16 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Fprintf(os.Stderr, "%s - UDP echo server\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "Usage: %s <IP> <portno>\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "you have to specify an IP address, even if it's only 127.0.0.1\n")
-		os.Exit(1)
+
+	usage()
+
+	maxTimeGap, err := time.ParseDuration("10m")
+	if err != nil {
+		log.Fatal("Couldn't parse desired time gap duration: %v\n", err)
 	}
 
 	ip := os.Args[1]
@@ -28,27 +30,32 @@ func main() {
 
 	b := make([]byte, 2048)
 
-	for {
-		fmt.Printf("Accepting a new packet\n")
+	lastPacketRecvd := time.Now()
 
-		cc, remote, rderr := conn.ReadFromUDP(b)
+	for i := 0; true; i++ {
+		cc, _, rderr := conn.ReadFromUDP(b)
+		currently := time.Now()
 
 		if rderr != nil {
 			fmt.Printf("net.ReadFromUDP() error: %s\n", rderr)
 		} else {
-			fmt.Printf("Read %d bytes from socket\n", cc)
-			fmt.Printf("Bytes: %q\n", string(b[:cc]))
-		}
+			if i > 0 {
+				if gap := currently.Sub(lastPacketRecvd); gap > maxTimeGap {
+					fmt.Printf("# Gap in receptions: %v\n\n", gap)
+				}
+			}
+			fmt.Printf("%s\t%s\n", time.Now().Format(time.RFC3339), string(b[:cc]))
 
-		fmt.Printf("Remote address: %v\n", remote)
-
-		cc, wrerr := conn.WriteTo(b[0:cc], remote)
-		if wrerr != nil {
-			fmt.Printf("net.WriteTo() error: %s\n", wrerr)
-		} else {
-			fmt.Printf("Wrote %d bytes to socket\n", cc)
+			lastPacketRecvd = currently
 		}
 	}
+}
 
-	fmt.Printf("Out of infinite loop\n")
+func usage() {
+	if len(os.Args) < 3 {
+		fmt.Fprintf(os.Stderr, "%s - UDP echo server\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s <IP> <portno>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "you have to specify an IP address, even if it's only 127.0.0.1\n")
+		os.Exit(1)
+	}
 }
