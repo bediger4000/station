@@ -2,7 +2,7 @@
 
 BME280 and DS18B20 sensors on a Raspberry Pi 3b+
 
-Don't use a [DHT11](../dht11_service) - they suck all around.
+Don't use a [DHT11](https://github.com/bediger4000/dht11_service) - they suck all around.
 Spend a few extra dollars on a BME280.
 More accurate, has a wider range, and better, easier to use driver.
 
