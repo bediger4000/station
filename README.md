@@ -24,6 +24,22 @@ weather predictions, etc.
 No data resides on the Raspberry Pi, since it can get unplugged,
 crash or suffer catastrophy like getting wet or iced up.
 
+## Raspberry Pi
+
+I2C has to be turned on for the BME280.
+1-wire has to be turned on for the  DS18B20.
+Use `raspi-config` to do this.
+
+`/boot/config.txt` has this in it after configuring:
+```
+dtparam=i2c_arm=on
+dtoverlay=w1-gpio
+```
+
+I think SPI has to be turned off.
+
+Probably needs a reboot to work.
+
 ## Client
 
 [Code](station.py)
