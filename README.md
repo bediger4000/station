@@ -12,7 +12,8 @@ Have a Raspberry Pi in a somewhat water-resistant box outside,
 reading atmospheric data
 (temperature, relative humidity, barometric pressue)
 sensors.
-The Raspberry Pi can connect to the house's WiFi network.
+The Raspberry Pi can connect to the house's WiFi network,
+so there's need for any cabling.
 
 A server process runs on some suitable Linux machine.
 It is addressable by the Raspberry Pi collecting data.
@@ -38,11 +39,49 @@ dtoverlay=w1-gpio
 
 I think SPI has to be turned off.
 
-Probably needs a reboot to work.
+Raspberry Pi robably needs a reboot to work after these changes.
+
+You can check that the DS18B20 is wired correctly by:
+
+```sh
+$ ls -l /sys/bus/w1/devices/
+total 0
+lrwxrwxrwx 1 root root 0 Mar  1 10:30 28-3c01a8162918 -> ../../../devices/w1_bus_master1/28-3c01a8162918
+lrwxrwxrwx 1 root root 0 Mar  1 19:59 w1_bus_master1 -> ../../../devices/w1_bus_master1
+```
+
+The "28-3c01a8162918" directory means the kernel detected a DS18B20.
+
+You can check that the BME280 is wired (mostly) correctly with:
+
+```sh
+$ pi@localhost:~ $ i2cdetect -y 1
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:                         -- -- -- -- -- -- -- -- 
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+70: -- -- -- -- -- -- -- 77                         
+```
+
+The "77" is apparently the BME280 I've got.
+Other brands will show as "76".
+
+The "77" will show up even if the GND wire isn't connected,
+but the BME280 won't produce any data,
+so this isn't a great connectivity test.
 
 ## Client
 
 [Code](station.py)
+
+The client requires installing [RPi.bme28](https://pypi.org/project/RPi.bme280/).
+The RPi.bme280 library seems reliable.
+I don't think I had to install the `smbus2` library - it seemed to come with
+Raspberry Pi OS.
 
 ## Data Saving Server
 
@@ -59,6 +98,8 @@ and fill up your local storage.
 That's why you have to specify an IP address for it to listen to on the command line.
 
 ### Build
+
+The data saving server doesn't depend on any 3rd party Go packages.
 
 ```sh
 $ go build server.go
