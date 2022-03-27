@@ -41,6 +41,8 @@ I think SPI has to be turned off.
 
 Raspberry Pi robably needs a reboot to work after these changes.
 
+### Sensor connectivity
+
 You can check that the DS18B20 is wired correctly by:
 
 ```sh
@@ -51,6 +53,8 @@ lrwxrwxrwx 1 root root 0 Mar  1 19:59 w1_bus_master1 -> ../../../devices/w1_bus_
 ```
 
 The "28-3c01a8162918" directory means the kernel detected a DS18B20.
+
+The Linux kernel also loads modules `w1_therm` if it finds a DS18B20.
 
 You can check that the BME280 is wired (mostly) correctly with:
 
@@ -69,6 +73,7 @@ $ pi@localhost:~ $ i2cdetect -y 1
 
 The "77" is apparently the BME280 I've got.
 Other brands will show as "76".
+See [station.py](station.py) for a place that must have this number correct.
 
 The "77" will show up even if the GND wire isn't connected,
 but the BME280 won't produce any data,
@@ -80,8 +85,15 @@ so this isn't a great connectivity test.
 
 The client requires installing [RPi.bme28](https://pypi.org/project/RPi.bme280/).
 The RPi.bme280 library seems reliable.
-I don't think I had to install the `smbus2` library - it seemed to come with
-Raspberry Pi OS.
+
+```sh
+$ pip3 install RPi.bme280
+```
+
+Install the `smbus2` library:
+```sh
+$ pip3 install smbus2
+```
 
 ## Data Saving Server
 
