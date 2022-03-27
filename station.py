@@ -22,7 +22,15 @@ def send_msg(msg):
 
 def ds18b20_temp():
 
-    fin = open(file_name, "r")
+    try:
+        fin = open(file_name, "r")
+    except FileNotFoundError:
+        print("Couldn't find thermometer file ", file_name)
+        return -41.00
+    except:
+        print("Problem opening thermometer file ", file_name)
+        return -42.00
+
     lines = fin.readlines()
     fin.close()
 
