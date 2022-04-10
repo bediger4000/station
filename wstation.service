@@ -1,0 +1,11 @@
+[Unit]
+Description=Weather Sensor daemon
+After=network.target
+
+[Service]
+ExecStart=/home/bediger/server q 10.0.0.1 7896
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy = multi-user.target
