@@ -36,24 +36,26 @@ func main() {
 
 	b := make([]byte, 2048)
 
+	receivedPacket := false
 	lastPacketRecvd := time.Now()
 	fmt.Fprintf(fout, "\n# Server starting %s\n", lastPacketRecvd.Format(time.RFC3339))
 
-	for i := 0; true; i++ {
+	for {
 		cc, _, err := conn.ReadFromUDP(b)
 		currently := time.Now()
 
 		if err != nil {
 			fmt.Fprintf(fout, "# %s net.ReadFromUDP() error: %s\n", time.Now().Format(time.RFC3339), err)
 		} else {
-			if i > 0 {
+			if receivedPacket {
 				if gap := currently.Sub(lastPacketRecvd); gap > maxTimeGap {
-					fmt.Printf("# Gap in receptions: %v\n\n", gap)
+					fmt.Fprintf(fout, "# Gap in receptions: %v\n\n", gap)
 				}
 			}
 			fmt.Fprintf(fout, "%s\t%s\n", time.Now().Format(time.RFC3339), string(b[:cc]))
 
 			lastPacketRecvd = currently
+			receivedPacket = true
 		}
 	}
 }
