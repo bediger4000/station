@@ -54,6 +54,10 @@ followed by a series of 1 or more -41 readings.
 The Python code found and read the device file, 
 but didn't get the expected output.
 That was followed by the device file disappearing for a while.
+I didn't reboot, power-cycle, or unplug and reseat the DS18B20 in the time interval
+shown above.
+I have no idea what's going on, that's contrary to my experience with other
+electronic devices.
 
 I have no idea if this is common to DS18B20 probes,
 or if this particular "Kookye" box was just full of crap implemenations,
