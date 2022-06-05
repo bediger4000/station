@@ -25,6 +25,40 @@ weather predictions, etc.
 No data resides on the Raspberry Pi, since it can get unplugged,
 crash or suffer catastrophy like getting wet or iced up.
 
+![working Raspberry Pi sensor station](PXL_20220329_233920826.jpg)
+
+## Sensor hardware experience
+
+DHT-11 temperature/relative humidity sensors are garbage.
+Don't use them, you can't trust them.
+They have a silly, CPU-intensive, error-prone electronic interface.
+
+The BME280 I bought sometimes "goes away".
+I have to power cycle to get it to send data to the RasPi.
+
+The DS18B20 temperature sensor that I got in a "Kookye" assortment of
+"IoT" sensors from Amazon periodically has some problems:
+
+![DS18B20 malfunctions](tempdropouts.png)
+
+DS18B20 communicates via the 1-Wire protocol.
+There's a Raspbian kernel driver for it.
+But occasionally the device file disappears.
+My Python daemon says temperature is -41C when that happens.
+
+If reading the device file doesn't give the expected text output,
+my Python daemon says temperature is -40C.
+
+All the DS18B20 temperature "dropouts" in the above image have a -40 reading
+followed by a series of 1 or more -41 readings.
+The Python code found and read the device file, 
+but didn't get the expected output.
+That was followed by the device file disappearing for a while.
+
+I have no idea if this is common to DS18B20 probes,
+or if this particular "Kookye" box was just full of crap implemenations,
+like the garbage DHT-11 implemenation in the same box.
+
 ## Raspberry Pi
 
 I2C has to be turned on for the BME280.
@@ -123,5 +157,11 @@ $ go build server.go
 $ nohup ./server 10.0.0.1 7689 > data.log 2> server.log &
 ```
 
-It's possible that a systemd service would be wise,
-letting the suitable server keep the data saving server running.
+If you don't have a systemd service keeping data saving server process running,
+you will lose data - humans forget to restart background processes.
+
+If you don't have a systemd server keeping the client process running on the Raspberry Pi,
+you will loose data.
+The RasPi will get power cycled or reboot and the client will no longer be running.
+
+UDP really truly is unreliable.
