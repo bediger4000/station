@@ -7,11 +7,11 @@ import smbus2
 import socket
 import sys
 
+file_name = ""
 device_dirs = glob.glob('/sys/bus/w1/devices/28-*')
 if len(device_dirs) < 1:
     print("no DS18B20 device directory found")
-
-file_name = device_dirs[0]+"/w1_slave"
+    file_name = device_dirs[0]+"/w1_slave"
 
 serverAddressPort = (sys.argv[1], int(sys.argv[2]))
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -21,6 +21,14 @@ def send_msg(msg):
     UDPClientSocket.sendto(bytesToSend, serverAddressPort)
 
 def ds18b20_temp():
+
+    if file_name == "":
+        device_dirs = glob.glob('/sys/bus/w1/devices/28-*')
+        if len(device_dirs) > 0:
+            file_name = device_dirs[0]+"/w1_slave"
+        else:
+            print("no DS18B20 device directory found")
+            return -43.00
 
     try:
         fin = open(file_name, "r")
