@@ -11,6 +11,7 @@ file_name = ""
 device_dirs = glob.glob('/sys/bus/w1/devices/28-*')
 if len(device_dirs) < 1:
     print("no DS18B20 device directory found")
+else:
     file_name = device_dirs[0]+"/w1_slave"
 
 serverAddressPort = (sys.argv[1], int(sys.argv[2]))
@@ -22,7 +23,9 @@ def send_msg(msg):
 
 def ds18b20_temp():
 
-    if file_name == "":
+    global file_name
+
+    if not file_name: 
         device_dirs = glob.glob('/sys/bus/w1/devices/28-*')
         if len(device_dirs) > 0:
             file_name = device_dirs[0]+"/w1_slave"
