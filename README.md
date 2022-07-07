@@ -59,6 +59,14 @@ shown above.
 I have no idea what's going on, that's contrary to my experience with other
 electronic devices.
 
+![different thermometer dropouts](ds18b20_dropouts.png)
+
+New mode of failure: read the temperature a 0C.
+I really don't know what's going on here.
+The [code](station.py) can only return a temperature of 0C if that's the reading.
+Missing device files, missing device file directories, etc,
+all cause the code to emit something like -40, -41, -42C.
+
 I have no idea if this is common to DS18B20 probes,
 or if this particular "Kookye" box was just full of crap implemenations,
 like the garbage DHT-11 implemenation in the same box.
