@@ -7,12 +7,8 @@ import smbus2
 import socket
 import sys
 
+# DS18B20 device file name
 file_name = ""
-device_dirs = glob.glob('/sys/bus/w1/devices/28-*')
-if len(device_dirs) < 1:
-    print("no DS18B20 device directory found")
-else:
-    file_name = device_dirs[0]+"/w1_slave"
 
 serverAddressPort = (sys.argv[1], int(sys.argv[2]))
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -37,9 +33,11 @@ def ds18b20_temp():
         fin = open(file_name, "r")
     except FileNotFoundError:
         print("Couldn't find thermometer file ", file_name)
+        file_name = ""
         return -41.00
     except:
         print("Problem opening thermometer file ", file_name)
+        file_name = ""
         return -42.00
 
     lines = fin.readlines()
