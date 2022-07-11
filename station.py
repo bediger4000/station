@@ -6,6 +6,7 @@ import glob
 import smbus2
 import socket
 import sys
+from datetime import datetime
 
 # DS18B20 device file name
 file_name = ""
@@ -15,7 +16,11 @@ UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 def send_msg(msg):
     bytesToSend = str.encode(msg)
-    UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+    try:
+        UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+    except Exception as e:
+        dt = datetime.now()
+        print(dt, e)
 
 def ds18b20_temp():
 
